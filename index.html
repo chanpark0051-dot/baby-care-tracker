@@ -282,7 +282,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </div>
 
 <script>
-const API_URL='https://script.google.com/macros/s/AKfycbxFV-GczR4dpHJjqXPde6CwPF3LABcNtpZOdXBMgJTYzs8WtPwKnVsFkgq2NuFv6Zjj_g/exec';
+const API_URL='https://script.google.com/macros/s/AKfycbyByYnvPWya3f6KRFuEv-KBoL-8pJ37TlSOwE5P4WPwRQk3J0CNfvgC1LTaSjiMHd1nIw/exec';
 const SK='bct_v3';
 let recs=[];
 let familyId='';
@@ -643,10 +643,11 @@ async function askAI(){
   document.getElementById('ai-box').innerHTML='<div class="dots"><span></span><span></span><span></span></div>';
   const prompt=`아기 월령: ${age}\n증상 카테고리: ${cat}\n세부 증상: ${det||'미선택'}\n추가 메모: ${memo||'없음'}\n\n다음 형식으로 답변해주세요:\n\n[가능한 원인]\n- 월령과 증상을 고려한 원인 2~3가지\n\n[대처법]\n- 실천 가능한 대처법 2~3가지\n\n[병원 방문이 필요한 경우]\n- 구체적인 증상 기준\n\n따뜻하고 친근한 어조로, 육아 초보 부모도 이해하기 쉽게 작성해주세요. 마지막에 의학적 조언이 아닌 참고용임을 한 줄로 명시해주세요.`;
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const res=await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'ai',prompt})});
     const data=await res.json();
-    document.getElementById('ai-box').textContent=data.content?.filter(c=>c.type==='text').map(c=>c.text).join('')||'답변을 가져오지 못했어요.';
-  }catch(e){document.getElementById('ai-box').textContent='오류가 발생했어요. 잠시 후 다시 시도해주세요.';}
+    if(data.error)throw new Error(data.error);
+    document.getElementById('ai-box').textContent=data.answer||'답변을 가져오지 못했어요.';
+  }catch(e){document.getElementById('ai-box').textContent='오류가 발생했어요. 잠시 후 다시 시도해주세요.\n('+e.message+')';}
 }
 
 initSetup();
